@@ -1,10 +1,10 @@
 {
   "name": "validator-smart-contracts",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "This repository contains Ethereum smart contracts that can be used to select and change the QBFT validators for Besu and GoQuorum Ethereum clients.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "directories": {
+    "test": "test"
   },
   "repository": {
     "type": "git",
@@ -18,11 +18,10 @@
   },
   "homepage": "https://github.com/ConsenSys/validator-smart-contracts#readme",
   "dependencies": {
-    "@openzeppelin/contracts-upgradeable": "^4.2.0",
     "save-dev": "^0.0.1-security",
     "web3": "^1.5.0"
   },
   "devDependencies": {
-    "@openzeppelin/contracts": "^4.2.0"
+    "truffle": "5.1.58"
   }
 }

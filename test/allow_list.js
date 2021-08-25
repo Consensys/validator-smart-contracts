@@ -21,7 +21,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         assert.equal(result[0], validators[0]);
     });
 
-    it("constructor cancan be called with more initial accounts than validators", async () => {
+    it("constructor can be called with more initial accounts than validators", async () => {
         myContract = await AllowListContract.new([accounts[0], accounts[1], accounts[2]], [validators[0]], {from: accounts[0]});
         let currentValidators = await myContract.getValidators()
         assert.lengthOf(currentValidators, 1);
@@ -156,8 +156,10 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         await allowListContract.voteToAddAccountToAllowList(accounts[2], {from: accounts[0]});
         await allowListContract.voteToAddAccountToAllowList(accounts[2], {from: accounts[1]});
         const web3Contract = new web3.eth.Contract(allowListContractAbi, allowListContract.address);
-        let numVotes = await web3Contract.methods.countVotes(accounts[2]).call({from: accounts[0]});
-        assert.equal(numVotes, 2);
+        let result = await web3Contract.methods.countVotes(accounts[2]).call({from: accounts[0]});
+        assert.equal(result.numVotes, 2);
+        assert.equal(result.requiredVotes, 2);
+        assert.equal(result.electionSucceeded, true);
     });
 
     it("account not on the allow list cannot call voteToAddAccountToAllowList", async () => {

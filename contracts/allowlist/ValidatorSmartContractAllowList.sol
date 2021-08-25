@@ -12,24 +12,26 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
         uint8 validatorIndex;
     }
 
+    uint constant MAX_VALIDATORS = 256;
+
     address[] private validators;
     mapping(address => accountInfo) private allowedAccounts;
     uint public numAllowedAccounts;
     mapping(address => address[]) private currentVotes;
 
     modifier senderIsAllowed() {
-        require(allowedAccounts[msg.sender].allowed == true, "sender is not on the allow list");
+        require(allowedAccounts[msg.sender].allowed, "sender is not on the allow list");
         _;
     }
 
     constructor (address[] memory initialAccounts, address[] memory initialValidators) public {
         require(initialAccounts.length > 0, "no inital allowed accounts");
         require(initialValidators.length > 0, "no inital validator accounts");
-
         require(initialAccounts.length >= initialValidators.length, "number of initial accounts smaller than number of inital validators");
+        require(initialValidators.length < MAX_VALIDATORS, "number of validators cannot be larger than 256");
+
         for (uint i = 0; i < initialAccounts.length; i++) {
             require(initialAccounts[i] != address(0), "initial accounts cannot be zero");
-            numAllowedAccounts++;
             if (i < initialValidators.length) {
                 require(initialValidators[i] != address(0), "initial validators cannot be zero");
                 allowedAccounts[initialAccounts[i]] = accountInfo(true, true, uint8(i));
@@ -38,6 +40,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 allowedAccounts[initialAccounts[i]] = accountInfo(true, false, 0);
             }
         }
+        numAllowedAccounts = initialAccounts.length;
     }
 
     function getValidators() override external view returns (address[] memory) {
@@ -53,7 +56,9 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
         if (allowedAccounts[msg.sender].activeValidator) {
             validators[allowedAccounts[msg.sender].validatorIndex] = newValidator;
         } else {
-            allowedAccounts[msg.sender] = accountInfo(true, true, uint8(validators.length));
+            require(validators.length < MAX_VALIDATORS, "number of validators cannot be larger than 256");
+            allowedAccounts[msg.sender].activeValidator = true;
+            allowedAccounts[msg.sender].validatorIndex = uint8(validators.length);
             validators.push(newValidator);
         }
 
@@ -68,7 +73,6 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
     }
 
     function voteToAddAccountToAllowList(address account) external senderIsAllowed {
-        require(account != address(0), "account to be added cannot be 0");
         require(allowedAccounts[account].allowed == false, "account to add is already on the allow list");
 
         for (uint i=0; i < currentVotes[account].length; i++) {
@@ -97,8 +101,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
         }
     }
 
-    function countVotes(address account) external senderIsAllowed returns(uint) {
-        uint numVotes;
+    function countVotes(address account) external senderIsAllowed returns(uint numVotes, uint requiredVotes, bool electionSucceeded) {
         for (uint i=0; i < currentVotes[account].length; i++) {
             if (allowedAccounts[currentVotes[account][i]].allowed) {
                 // only increment numVotes if account that voted is still allowed
@@ -106,13 +109,12 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
             }
         }
         if (numVotes > numAllowedAccounts / 2) {
-            delete(currentVotes[account]); // Is it a good idea to delete the array? What else could I do? Array should be max 128 long
+            delete(currentVotes[account]);
             if (allowedAccounts[account].allowed) {
                 numAllowedAccounts--;
                 if(allowedAccounts[account].activeValidator) {
-                    for(uint i=allowedAccounts[account].validatorIndex; i < validators.length - 1; i++) {
-                        validators[i] = validators[i+1];
-                    }
+                    require(validators.length > 1, "cannot remove allowed account with last active validator");
+                    validators[allowedAccounts[account].validatorIndex] = validators[validators.length - 1];
                     validators.pop();
                 }
                 delete(allowedAccounts[account]);
@@ -120,8 +122,9 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 numAllowedAccounts++;
                 allowedAccounts[account] = accountInfo(true, false, 0);
             }
+            return (numVotes, numAllowedAccounts / 2 + 1, true);
         }
-        return numVotes;
+        return (numVotes, numAllowedAccounts / 2 + 1, false);
     }
 }
 
