@@ -11,7 +11,7 @@
     "url": "git+https://github.com/ConsenSys/validator-smart-contracts.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "ConsenSys Software",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ConsenSys/validator-smart-contracts/issues"

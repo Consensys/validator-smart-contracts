@@ -7,7 +7,10 @@ var allowListContractAbi = parsed.abi;
 
 
 contract ("Account Ingress (no contracts registered)", (accounts) => {
-    const validators = accounts;
+    let validators = [];
+    for(i=0; i<accounts.length; i++) {
+        validators[i] = accounts[accounts.length - 1 - i];
+    }
 
     let allowListContract;
 
@@ -118,20 +121,28 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         assert.equal(currentValidators[0], validators[1]);
     });
 
-    it("can remove a vote", async () => {
-        await addValidators(1, 2);
+    it("cannot remove allowed account with last active validator", async () => {
+        await addValidators(1, 1);
 
-        let numAllowedAccounts = await allowListContract.numAllowedAccounts();
-        assert.equal(numAllowedAccounts, 3);
+        let currentValidators = await allowListContract.getValidators();
+        assert.lengthOf(currentValidators, 2);
+        assert.equal(currentValidators[0], validators[0]);
+        assert.equal(currentValidators[1], validators[1]);
 
-        await allowListContract.voteToAddAccountToAllowList(accounts[3], {from: accounts[0]});
-        await allowListContract.voteToAddAccountToAllowList(accounts[3], {from: accounts[1]});
+        await allowListContract.deactivate({from: accounts[1]});
 
-        await allowListContract.removeVoteForAccount(accounts[3], {from: accounts[0]});
+        await allowListContract.voteToRemoveAccountFromAllowList(accounts[0], {from: accounts[0]});
+        await allowListContract.voteToRemoveAccountFromAllowList(accounts[0], {from: accounts[1]});
+        try {
+            await allowListContract.countVotes(accounts[0]);
+            assert.fail("no inital validator accounts\"");
+        } catch (err) {
+            expect(err.reason).to.contain("cannot remove allowed account with last active validator");
+        }
 
-        await allowListContract.countVotes(accounts[2]);
-        numAllowedAccounts = await allowListContract.numAllowedAccounts();
-        assert.equal(numAllowedAccounts, 3);
+        currentValidators = await allowListContract.getValidators();
+        assert.lengthOf(currentValidators, 1);
+        assert.equal(currentValidators[0], validators[0]);
     });
 
     it("can remove a vote", async () => {
@@ -150,7 +161,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         assert.equal(numAllowedAccounts, 3);
     });
 
-    it("can call countVotes to get number of votes for an account", async () => {
+    it("can call countVotes to get number of votes, required votes and election success for an account", async () => {
         await addValidators(1, 1);
 
         await allowListContract.voteToAddAccountToAllowList(accounts[2], {from: accounts[0]});
