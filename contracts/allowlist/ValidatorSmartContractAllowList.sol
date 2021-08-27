@@ -25,9 +25,9 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
     }
 
     constructor (address[] memory initialAccounts, address[] memory initialValidators) public {
-        require(initialAccounts.length > 0, "no inital allowed accounts");
-        require(initialValidators.length > 0, "no inital validator accounts");
-        require(initialAccounts.length >= initialValidators.length, "number of initial accounts smaller than number of inital validators");
+        require(initialAccounts.length > 0, "no initial allowed accounts");
+        require(initialValidators.length > 0, "no initial validator accounts");
+        require(initialAccounts.length >= initialValidators.length, "number of initial accounts smaller than number of initial validators");
         require(initialValidators.length < MAX_VALIDATORS, "number of validators cannot be larger than 256");
 
         for (uint i = 0; i < initialAccounts.length; i++) {

@@ -135,7 +135,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         await allowListContract.voteToRemoveAccountFromAllowList(accounts[0], {from: accounts[1]});
         try {
             await allowListContract.countVotes(accounts[0]);
-            assert.fail("no inital validator accounts\"");
+            assert.fail("no initial validator accounts");
         } catch (err) {
             expect(err.reason).to.contain("cannot remove allowed account with last active validator");
         }
@@ -156,7 +156,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
 
         await allowListContract.removeVoteForAccount(accounts[3], {from: accounts[0]});
 
-        await allowListContract.countVotes(accounts[2]);
+        await allowListContract.countVotes(accounts[3]);
         numAllowedAccounts = await allowListContract.numAllowedAccounts();
         assert.equal(numAllowedAccounts, 3);
     });
@@ -203,7 +203,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
     it("account not on the allow list cannot call activate", async () => {
         try {
             await allowListContract.activate(accounts[0], {from: accounts[3]});
-            assert.fail("Should not allow account not on the allow list to call countVotes");
+            assert.fail("Should not allow account not on the allow list to call activate");
         } catch (err) {
             expect(err.reason).to.contain("sender is not on the allow list");
         }
@@ -221,43 +221,43 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
     it("account not on the allow list cannot call removeVoteForAccount", async () => {
         try {
             await allowListContract.removeVoteForAccount(accounts[0], {from: accounts[3]});
-            assert.fail("Should not allow account not on the allow list to call countVotes");
+            assert.fail("Should not allow account not on the allow list to call removeVoteForAccount");
         } catch (err) {
             expect(err.reason).to.contain("sender is not on the allow list");
         }
     });
 
-    it("account not on the allow list cannot call add", async () => {
+    it("can add multiple accounts to allow list, each activating a validator", async () => {
         await addValidators(1, 9);
         let web3Contract = new web3.eth.Contract(allowListContractAbi, allowListContract.address);
         let validators = await web3Contract.methods.getValidators().call();
         assert.equal(validators.length, 10);
     });
 
-    it("constructor cannot be called without inital account", async () => {
+    it("constructor cannot be called without initial account", async () => {
         try {
             allowListContract = await AllowListContract.new([], [validators[0]], {from: accounts[0]});
-            assert.fail("no inital allowed accounts");
+            assert.fail("no initial allowed accounts");
         } catch (err) {
-            expect(err.reason).to.contain("no inital allowed accounts");
+            expect(err.reason).to.contain("no initial allowed accounts");
         }
     });
 
-    it("constructor cannot be called without inital validator", async () => {
+    it("constructor cannot be called without initial validator", async () => {
         try {
             allowListContract = await AllowListContract.new([accounts[0]], [], {from: accounts[0]});
-            assert.fail("no inital validator accounts\"");
+            assert.fail("no initial validator accounts\"");
         } catch (err) {
-            expect(err.reason).to.contain("no inital validator accounts");
+            expect(err.reason).to.contain("no initial validator accounts");
         }
     });
 
     it("constructor cannot be called with initial accounts smaller than initial validators", async () => {
         try {
             allowListContract = await AllowListContract.new([accounts[0]], [validators[0], validators[1]], {from: accounts[0]});
-            assert.fail("number of initial accounts smaller than number of inital validators");
+            assert.fail("number of initial accounts smaller than number of initial validators");
         } catch (err) {
-            expect(err.reason).to.contain("number of initial accounts smaller than number of inital validators");
+            expect(err.reason).to.contain("number of initial accounts smaller than number of initial validators");
         }
     });
 
@@ -270,7 +270,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         }
     });
 
-    it("constructor cannot be called with initial accounts of 0", async () => {
+    it("constructor cannot be called with initial validators of 0", async () => {
         try {
             allowListContract = await AllowListContract.new([accounts[0]], ['0x0000000000000000000000000000000000000000'], {from: accounts[0]});
             assert.fail("initial validators cannot be zero");
@@ -278,6 +278,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             expect(err.reason).to.contain("initial validators cannot be zero");
         }
     });
+
     // assumes that accounts 0 to start-1 are allowed
     // adds accounts [start] to [end] with activated validators [start] to [end]
     async function addValidators(start, end) {
@@ -289,5 +290,4 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.activate(validators[i], {from: accounts[i]});
         }
     }
-
 });
