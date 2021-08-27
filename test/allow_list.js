@@ -165,9 +165,14 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         await addValidators(1, 1);
 
         await allowListContract.voteToAddAccountToAllowList(accounts[2], {from: accounts[0]});
-        await allowListContract.voteToAddAccountToAllowList(accounts[2], {from: accounts[1]});
         const web3Contract = new web3.eth.Contract(allowListContractAbi, allowListContract.address);
         let result = await web3Contract.methods.countVotes(accounts[2]).call({from: accounts[0]});
+        assert.equal(result.numVotes, 1);
+        assert.equal(result.requiredVotes, 2);
+        assert.equal(result.electionSucceeded, false);
+
+        await allowListContract.voteToAddAccountToAllowList(accounts[2], {from: accounts[1]});
+        result = await web3Contract.methods.countVotes(accounts[2]).call({from: accounts[0]});
         assert.equal(result.numVotes, 2);
         assert.equal(result.requiredVotes, 2);
         assert.equal(result.electionSucceeded, true);

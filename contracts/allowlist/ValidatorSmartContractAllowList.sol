@@ -6,6 +6,35 @@ import "../ValidatorSmartContractInterface.sol";
 
 contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
 
+    event AllowedAccount(
+        address account,
+        bool added
+    );
+
+    event Validator(
+        address validator,
+        address byAccount,
+        uint numValidators,
+        bool activated
+    );
+
+    event Vote(
+        address accountVotedFor,
+        address votingAccout,
+        uint numVotes,
+        uint numVotesNeeded,
+        bool voteToAdd,
+        bool voteRemoved
+    );
+
+    event CountVotes(
+        address accountVotedFor,
+        address countingAccout,
+        uint numVotes,
+        uint numVotesNeeded,
+        bool add
+    );
+
     struct accountInfo {
         bool allowed;
         bool activeValidator;
@@ -61,15 +90,17 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
             allowedAccounts[msg.sender].validatorIndex = uint8(validators.length);
             validators.push(newValidator);
         }
-
+        emit Validator(newValidator, msg.sender, validators.length, true);
     }
 
     function deactivate() external senderIsAllowed {
         require(validators.length > 1, "cannot deactivate last validator");
         require(allowedAccounts[msg.sender].activeValidator, "sender does not have an active validator");
         allowedAccounts[msg.sender].activeValidator = false;
+        address validatorRemoved = validators[allowedAccounts[msg.sender].validatorIndex];
         validators[allowedAccounts[msg.sender].validatorIndex] = validators[validators.length-1];
         validators.pop();
+        emit Validator(validatorRemoved, msg.sender, validators.length, false);
     }
 
     function voteToAddAccountToAllowList(address account) external senderIsAllowed {
@@ -79,6 +110,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
             require(currentVotes[account][i] != msg.sender, "sender has already voted to add account");
         }
         currentVotes[account].push(msg.sender);
+        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, true, false);
     }
 
     function voteToRemoveAccountFromAllowList(address account) external senderIsAllowed {
@@ -89,6 +121,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
             require(currentVotes[account][i] != msg.sender, "sender has already voted to remove account");
         }
         currentVotes[account].push(msg.sender);
+        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, false, false);
     }
 
     function removeVoteForAccount(address account) external senderIsAllowed {
@@ -99,6 +132,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 break;
             }
         }
+        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, !(allowedAccounts[account].allowed), false);
     }
 
     function countVotes(address account) external senderIsAllowed returns(uint numVotes, uint requiredVotes, bool electionSucceeded) {
@@ -122,9 +156,10 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 numAllowedAccounts++;
                 allowedAccounts[account] = accountInfo(true, false, 0);
             }
-            return (numVotes, numAllowedAccounts / 2 + 1, true);
+            emit AllowedAccount(account, allowedAccounts[account].allowed);
         }
-        return (numVotes, numAllowedAccounts / 2 + 1, false);
+        emit CountVotes(account, msg.sender, numVotes, numAllowedAccounts / 2 + 1, !(allowedAccounts[account].allowed));
+        return (numVotes, numAllowedAccounts / 2 + 1, numVotes > numAllowedAccounts / 2);
     }
 }
 
