@@ -7,32 +7,24 @@ import "../ValidatorSmartContractInterface.sol";
 contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
 
     event AllowedAccount(
-        address account,
+        address indexed account,
         bool added
     );
 
     event Validator(
-        address validator,
-        address byAccount,
+        address indexed validator,
+        address indexed byAccount,
         uint numValidators,
         bool activated
     );
 
     event Vote(
-        address accountVotedFor,
-        address votingAccout,
+        address indexed accountVotedFor,
+        address indexed votingAccout,
         uint numVotes,
         uint numVotesNeeded,
         bool voteToAdd,
         bool voteRemoved
-    );
-
-    event CountVotes(
-        address accountVotedFor,
-        address countingAccout,
-        uint numVotes,
-        uint numVotesNeeded,
-        bool add
     );
 
     struct accountInfo {
@@ -46,7 +38,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
     address[] private validators;
     mapping(address => accountInfo) private allowedAccounts;
     uint public numAllowedAccounts;
-    mapping(address => address[]) private currentVotes;
+    mapping(address => address[]) private currentVotes; // mapping the votes for adding or removing an account to the accounts that voted for it
 
     modifier senderIsAllowed() {
         require(allowedAccounts[msg.sender].allowed, "sender is not on the allow list");
@@ -158,7 +150,6 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
             }
             emit AllowedAccount(account, allowedAccounts[account].allowed);
         }
-        emit CountVotes(account, msg.sender, numVotes, numAllowedAccounts / 2 + 1, !(allowedAccounts[account].allowed));
         return (numVotes, numAllowedAccounts / 2 + 1, numVotes > numAllowedAccounts / 2);
     }
 }
