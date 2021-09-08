@@ -1,0 +1,17 @@
+{
+  "name": "create_qbft_genesis_content",
+  "version": "1.0.0",
+  "main": "createContent.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bn.js": "^4.11.9",
+    "web3-utils": "1.5.2",
+    "xregexp": "^5.1.0"
+  },
+  "description": ""
+}

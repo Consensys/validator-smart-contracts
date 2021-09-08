@@ -2,7 +2,7 @@
 
 pragma solidity >=0.5.0;
 
-import "../ValidatorSmartContractInterface.sol";
+import "ValidatorSmartContractInterface.sol";
 
 contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
 
@@ -45,7 +45,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
         _;
     }
 
-    constructor (address[] memory initialAccounts, address[] memory initialValidators) public {
+    constructor (address[] memory initialAccounts, address[] memory initialValidators) {
         require(initialAccounts.length > 0, "no initial allowed accounts");
         require(initialValidators.length > 0, "no initial validator accounts");
         require(initialAccounts.length >= initialValidators.length, "number of initial accounts smaller than number of initial validators");
