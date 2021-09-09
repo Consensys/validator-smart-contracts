@@ -22,14 +22,14 @@ repository contains a javascript script that creates the storage section for thi
 
 ### Build the Contract
 
-To create the contract code that needs to be specified in the genesis file this contract needs to be compiled with the
+To create the contract code that needs to be specified in the genesis file, this contract needs to be compiled with the
 option `--bin-runtime`.
 
 After copying the interface contract into this directory
 
     cp ../ValidatorSmartContractInterface.sol .
 
-the contract can be build using solc 0.8.7 
+the contract can be compiled using solc 0.8.7 
 
     solc --optimize --bin-runtime --evm-version=byzantium -o . ./ValidatorSmartContractAllowList.sol
 

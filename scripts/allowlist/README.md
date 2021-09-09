@@ -1,18 +1,18 @@
 # Genesis File Content
 
-This directory contains a script (_createContent.js_) that generates some content that needs to be added to the genesis 
-file of a network that makes use of the allowlist smart contracts (_contracts/allowlist_).
+This directory contains a script (`createContent.js`) that generates some content that needs to be added to the genesis 
+file of a network that makes use of the allowlist smart contracts (`contracts/allowlist`).
 
 ### Install the dependencies
 
-To install the depencies of the script run _`npm install`_ in the _scripts/allowlist_ directory. 
+To install the dependencies of the script run `npm install` in the `scripts/allowlist` directory. 
 
 ### Input File
 
-The script reads the file _allowedAccountsAndValidators.txt_ that defines in each line the address of an allowed account and
+The script reads the file `allowedAccountsAndValidators.txt` that defines in each line the address of an allowed account and
 (optionally) the validator for that account. The account and the validator are specified using their address as a 
-hexadecimal string. If the account has a nominated validator the account and the validator hexadecimal strings need
-to be separeted by a comma:
+hexadecimal string. If the account has a nominated validator, the account and the validator hexadecimal strings need
+to be separated by a comma:
 
     0x5B38Da6a701c568545dCfcB03FcB875f56beddC4, 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
     0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c
@@ -22,10 +22,10 @@ The two lines above specify three accounts on the allow list, as well as the val
 
 ### Run the Script
 
-To run the script in the _scripts/allowlist_ directory: _`node createContent.js`_
+To run the script in the `scripts/allowlist` directory: `node createContent.js`
 ###Output
 
-The script creates a file named _Storage.txt_. The content of this file for the example above will look like this:
+The script creates a file named `Storage.txt`. The content of this file for the example above will look like this:
 
     "0x<Address of Contract>": {
       "balance": "0x00",
@@ -37,20 +37,20 @@ The script creates a file named _Storage.txt_. The content of this file for the 
         "36306db541fd1551fd93a60031e8a8c89d69ddef41d6249f5fdc265dbc8fffa2": "0000000000000000000000000000000000000000000000000000000000000101",
         "58d9a93947083dcdedec58d43912ce0326f251a85b7701c5de5bc7d7a150676e": "0000000000000000000000000000000000000000000000000000000000000001",
         "e20f19dc6931eb9e42fe3f21abe1a9ef59942d8e586871d88564d0d0b63a5e5c": "0000000000000000000000000000000000000000000000000000000000010101",
-        "0000000000000000000000000000000000000000000000000000000000000002": "0000000000000000000000000000000000000000000000000000000000000003" 
+        "0000000000000000000000000000000000000000000000000000000000000002": "0000000000000000000000000000000000000000000000000000000000000003"
       },
       "version": "0x01"
     }
 
-The content of the file needs to be places in the genesis file for the network. In addition the <_Address of Contract_> 
+The content of the file needs to be placed in the genesis file for the network. In addition the <_Address of Contract_> 
 and <_Contract Code_> need to be filled in.
 
-An example of a genesis file using qbft can be found in the _genesis.json_ file in this directory.
+An example of a genesis file using QBFT can be found in the `genesis.json` file in this directory.
 
-* The <_Address of Contract_> needs to be the same that is stated in the qbft section of the genesis file for the _validatorcontractaddress_.
-* The <_Contract Code_> needs to contain the binary runtime code for the _ValidatorSmartContractAllowList.sol_ contract in _contracts/allowlist_.  
+* The <_Address of Contract_> needs to be the same that is stated in the _qbft_ section of the genesis file for the _validatorcontractaddress_.
+* The <_Contract Code_> needs to contain the binary runtime code for the `ValidatorSmartContractAllowList.sol` contract in `contracts/allowlist`.  
   The binary can be found in the example genesis.json file in this directory. For this binary the 
-_ValidatorSmartContractAllowList.sol_ contract was compiled using --_bin-runtime_ and --_optimize_ options of the solidity compiler
+`ValidatorSmartContractAllowList.sol` contract was compiled using --_bin-runtime_ and --_optimize_ options of the solidity compiler
 
 General information about the genesis file can be found here: https://besu.hyperledger.org/en/stable/Reference/Config-Items/  
 
