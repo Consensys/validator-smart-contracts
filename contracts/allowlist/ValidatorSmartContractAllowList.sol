@@ -124,7 +124,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 break;
             }
         }
-        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, !(allowedAccounts[account].allowed), false);
+        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, !(allowedAccounts[account].allowed), true);
     }
 
     function countVotes(address account) external senderIsAllowed returns(uint numVotes, uint requiredVotes, bool electionSucceeded) {
