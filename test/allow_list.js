@@ -306,6 +306,38 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         }
     });
 
+    it("allowedAccounts mappings validator index is updated correctly", async () => {
+        await addValidators(1, 1);
+
+        let numAllowedAccounts = await allowListContract.numAllowedAccounts();
+        assert.equal(numAllowedAccounts, 2);
+
+        await allowListContract.deactivate({from: accounts[0]});
+
+        const web3Contract = new web3.eth.Contract(allowListContractAbi, allowListContract.address);
+        let vals = await web3Contract.methods.getValidators().call({from: accounts[0]});
+        assert.equal(vals.length, 1);
+
+        await allowListContract.activate(validators[0], {from: accounts[1]});
+        // HERE
+        //
+        //
+        //
+        // await allowListContract.voteToRemoveAccountFromAllowList(accounts[0], {from: accounts[1]});
+        // await allowListContract.countVotes(accounts[0]);
+        //
+        // let numAllowedAccounts = await allowListContract.numAllowedAccounts();
+        // assert.equal(numAllowedAccounts, 1);
+        //
+        // await allowListContract.voteToAddAccountToAllowList(accounts[3], {from: accounts[1]});
+        //
+        // await allowListContract.removeVoteForAccount(accounts[3], {from: accounts[0]});
+        //
+        // await allowListContract.countVotes(accounts[3]);
+        // numAllowedAccounts = await allowListContract.numAllowedAccounts();
+        // assert.equal(numAllowedAccounts, 3);
+    });
+
     // assumes that accounts 0 to start-1 are allowed
     // adds accounts [start] to [end] with activated validators [start] to [end]
     async function addValidators(start, end) {

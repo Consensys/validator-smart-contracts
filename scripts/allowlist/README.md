@@ -27,21 +27,23 @@ To run the script in the `scripts/allowlist` directory: `node createContent.js`
 
 The script creates a file named `Storage.txt`. The content of this file for the example above will look like this:
 
-    "0x<Address of Contract>": {
-      "balance": "0x00",
-      "code": "0x<Contract Code>"
-      "storage": {
-        "0000000000000000000000000000000000000000000000000000000000000000": "0000000000000000000000000000000000000000000000000000000000000002",
-        "290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563": "000000000000000000000000ab8483f64d9c6d1ecf9b849ae677dd3315835cb2",
-        "290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e564": "00000000000000000000000079731d3ca6b7e34ac0f824c42a7cc18a495cabab",
-        "36306db541fd1551fd93a60031e8a8c89d69ddef41d6249f5fdc265dbc8fffa2": "0000000000000000000000000000000000000000000000000000000000000101",
-        "58d9a93947083dcdedec58d43912ce0326f251a85b7701c5de5bc7d7a150676e": "0000000000000000000000000000000000000000000000000000000000000001",
-        "e20f19dc6931eb9e42fe3f21abe1a9ef59942d8e586871d88564d0d0b63a5e5c": "0000000000000000000000000000000000000000000000000000000000010101",
-        "0000000000000000000000000000000000000000000000000000000000000002": "0000000000000000000000000000000000000000000000000000000000000003"
-      },
-      "version": "0x01"
-    }
-
+	"<insert contract address here>": {
+		"comment": "validator smart contract",
+		"balance": "0x00",
+		"code": "0x<insert bin-runtime code of the contract here>",
+		"storage": {
+			"0000000000000000000000000000000000000000000000000000000000000000": "0000000000000000000000000000000000000000000000000000000000000002",
+			"290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563": "000000000000000000000000ab8483f64d9c6d1ecf9b849ae677dd3315835cb2",
+			"290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e564": "00000000000000000000000079731d3ca6b7e34ac0f824c42a7cc18a495cabab",
+			"02e472438281ece9fae629c31ebc952b0b512971efb1bacfc7d4441c586cff6c": "0000000000000000000000005b38da6a701c568545dcfcb03fcb875f56beddc4",
+			"36306db541fd1551fd93a60031e8a8c89d69ddef41d6249f5fdc265dbc8fffa2": "0000000000000000000000000000000000000000000000000000000000000101",
+			"58d9a93947083dcdedec58d43912ce0326f251a85b7701c5de5bc7d7a150676e": "0000000000000000000000000000000000000000000000000000000000000001",
+			"e0ddd3944b4f9c65a068b84248d68e1f0f838457a33299384eef528de71c9c0c": "0000000000000000000000004b20993bc481177ec7e8f571cecae8a9e22c02db",
+			"e20f19dc6931eb9e42fe3f21abe1a9ef59942d8e586871d88564d0d0b63a5e5c": "0000000000000000000000000000000000000000000000000000000000010101",
+			"0000000000000000000000000000000000000000000000000000000000000002": "0000000000000000000000000000000000000000000000000000000000000003"
+		},
+		"version": "0x01"
+	}
 The content of the file needs to be placed in the genesis file for the network. In addition the <_Address of Contract_> 
 and <_Contract Code_> need to be filled in.
 
@@ -50,7 +52,7 @@ An example of a genesis file using QBFT can be found in the `genesis.json` file 
 * The <_Address of Contract_> needs to be the same that is stated in the _qbft_ section of the genesis file for the _validatorcontractaddress_.
 * The <_Contract Code_> needs to contain the binary runtime code for the `ValidatorSmartContractAllowList.sol` contract in `contracts/allowlist`.  
   The binary can be found in the example genesis.json file in this directory. For this binary the 
-`ValidatorSmartContractAllowList.sol` contract was compiled using --_bin-runtime_ and --_optimize_ options of the solidity compiler
+`ValidatorSmartContractAllowList.sol` contract was compiled using _--bin-runtime_, _--evm-version byzantium_ and _--optimize_ options of the solidity compiler
 
 General information about the genesis file can be found here: https://besu.hyperledger.org/en/stable/Reference/Config-Items/  
 
@@ -60,20 +62,10 @@ The storage section defines the state of the contract in the genesis block of th
 For general information on the layout of state variables in storage see 
 https://docs.soliditylang.org/en/v0.8.7/internals/layout_in_storage.html.
 
-Each line of the section contains two 32 byte hexadecimal numbers. The first is the **_slot_** number. Each slot 
-holds 32 bytes of the state of the contract. The second hexadecimal number contains the content of that state storage.
+The storage section created by the `createContent.js` script defines 
+ * the initial `validators` array
+ * the initial `allowedAccounts` mapping
+ * the initial `numAllowedAccounts` uint
 
-Slot(0), the first line of the section, contains the length of the validator array, in this case 2. The validator array itself is stored 
-starting in slot keccak(32bytes of 0), which is _290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563_. The two slots
-containing the two validators are defined in line 2 and 3 of the storage section. The content of the two slots are the 
-addresses of the validators.
-
-Lines 4 to 6 contain the mapping for the three allowed accounts. The data for each account is stored in 
-slot(keccak(<32 bytes account address> | 32 bytes address of slot(1))). The 32 byte stored for each account are
-
-* byte(0): boolean meaning that this account is allowed, always 0x01 
-* byte(1): boolean indicating whether this account has an active validator
-* bytes(2-9): 8 byte unsigned integer indicating the index of its validator in the validator array
-
-Line 7 of the section (slot(2)) contains the number of allowed accounts, here 3.
+For more detail plese see the script.
 

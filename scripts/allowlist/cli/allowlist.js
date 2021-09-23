@@ -1,26 +1,17 @@
 const Web3 = require("web3");
 const Contract = require("@truffle/contract");
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const Yargs = require('yargs');
 const XRegExp = require('xregexp');
 const Fs = require('fs');
-
-
-const abi = Fs.readFileSync('ValidatorSmartContractAllowList.abi', 'utf-8');
-const contractJson = JSON.parse(abi);
-
-const argv = Yargs
+const argv = require('yargs')
+    .env('ALLOWLIST')
     .command('activate <validator>', 'activates a validator for the sender of the transaction', {
         validator: {
             description: 'address of the validator as a hexadecimal string',
             type: 'string',
         }
     })
-    .command('deactivate <validator>', 'deactivates the validator for the sender of the transaction', {
-        validator: {
-            description: 'address of the validator as a hexadecimal string',
-            type: 'string',
-        }
+    .command('deactivate', 'deactivates the validator for the sender of the transaction', {
     })
     .command('addAccount <account>', 'vote for an account to be added to the allowlist', {
         account: {
@@ -59,7 +50,6 @@ const argv = Yargs
     })
     .option('privateKey', {
         alias: 'p',
-        demandOption: true,
         describe: 'private key in hexadecimal format',
         type: 'string',
     })
@@ -79,23 +69,6 @@ const argv = Yargs
     .help()
     .alias('help', 'h')
     .argv;
-
-// console.log(argv);
-
-let provider = new HDWalletProvider({
-    privateKeys:[getHex(argv.privateKey, 64, false, "privateKey")],
-    providerOrUrl:argv.url,
-    chainId:Number(argv.chainId)
-});
-
-web3 = new Web3(provider);
-web3.eth.handleRevert = true;
-
-const node1Account = web3.eth.accounts.privateKeyToAccount("0x70f1384b24df3d2cdaca7974552ec28f055812ca5e4da7a0ccd0ac0f8a4a9b00");
-const node2Account = web3.eth.accounts.privateKeyToAccount("0xad0352cfc09aa0128db4e135fcea276523c400163dcc762a11ecba29d5f0a34a");
-console.log(`Node 1  private key: 0x70f1384b24df3d2cdaca7974552ec28f055812ca5e4da7a0ccd0ac0f8a4a9b00  Account: ${node1Account.address}`)
-console.log(`Node 2  private key: 0xad0352cfc09aa0128db4e135fcea276523c400163dcc762a11ecba29d5f0a34a  Account: ${node2Account.address}`)
-
 
 function prefix0x(need0x, str) {
     if (need0x && !str.startsWith('0x')) {
@@ -134,7 +107,19 @@ async function getEvent(eventname, mycontract, receipt) {
     console.log(`Event from transaction:\n${JSON.stringify(event[0], null, 4)}`)
 }
 
-async function doWork() {
+async function main() {
+    const abi = Fs.readFileSync('ValidatorSmartContractAllowList.abi', 'utf-8');
+    const contractJson = JSON.parse(abi);
+
+    let provider = new HDWalletProvider({
+        privateKeys:[getHex(argv.privateKey, 64, false, "privateKey")],
+        providerOrUrl:argv.url,
+        chainId:Number(argv.chainId)
+    });
+
+    web3 = new Web3(provider);
+    web3.eth.handleRevert = true;
+
     const myAccount = web3.eth.accounts.privateKeyToAccount(prefix0x(true, argv.privateKey));
     const mycontract = await new web3.eth.Contract(contractJson, getHex(argv.contractAddress, 40, false, "contractAddress"));
 
@@ -153,14 +138,12 @@ async function doWork() {
         process.exit(-1);
     }
 
-    let success;
     let status;
     let receipt;
     try {
         switch (argv._[0]) {
             case "getValidators":
-                // const validators = await mycontract.methods.getValidators().call();
-                console.log(`Validators: ${validators}`);
+                console.log(`Validators: ${validators}`); // validators have already been retrieved to check contract
                 break;
             case "numAllowedAccounts":
                 const numAllowedAccounts = await mycontract.methods.numAllowedAccounts().call();
@@ -170,14 +153,14 @@ async function doWork() {
                 console.log(`Sending a transaction from account ${myAccount.address} to activate validator ${argv.validator}`);
                 receipt = await mycontract.methods.activate(getHex(argv.validator, 40, true, "validator")).send({from: myAccount.address});
                 status = receipt.status ? "Success" : "Failed";
-                console.log(`Activating validator ${argv.validator}: ${status}`);
+                console.log(`Activating validator ${argv.validator} for account ${myAccount.address}: ${status}`);
                 await getEvent("Validator", mycontract, receipt);
                 break;
             case "deactivate":
                 console.log(`Sending a transaction from account ${myAccount.address} to deactivate its validator`);
                 receipt = await mycontract.methods.deactivate().send({from: myAccount.address});
                 status = receipt.status ? "Success" : "Failed";
-                console.log(`Deactivating validator ${argv.validator}: ${status}`);
+                console.log(`Deactivating validator for account ${myAccount.address}: ${status}`);
                 await getEvent("Validator", mycontract, receipt);
                 break;
             case "addAccount":
@@ -223,6 +206,8 @@ async function doWork() {
     }
 
     process.exit(0);
-
 }
-doWork();
+
+if (require.main === module) {
+    main();
+}
