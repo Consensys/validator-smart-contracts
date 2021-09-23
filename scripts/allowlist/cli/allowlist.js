@@ -45,7 +45,7 @@ const argv = require('yargs')
         alias: 'a',
         demandOption: true,
         default: "0000000000000000000000000000000000008888",
-        describe: 'private key in hexadecimal format',
+        describe: 'address of the validator management contract',
         type: 'string',
     })
     .option('privateKey', {

@@ -5,7 +5,7 @@ file of a network that makes use of the allowlist smart contracts (`contracts/al
 
 ### Install the dependencies
 
-To install the dependencies of the script run `npm install` in the `scripts/allowlist` directory. 
+To install the dependencies of the script run `npm install` in the `scripts/allowlist/genesisContent` directory. 
 
 ### Input File
 
@@ -22,7 +22,7 @@ The two lines above specify three accounts on the allow list, as well as the val
 
 ### Run the Script
 
-To run the script in the `scripts/allowlist` directory: `node createContent.js`
+To run the script in the `scripts/allowlist/genesisContent` directory: `node createContent.js`
 ###Output
 
 The script creates a file named `Storage.txt`. The content of this file for the example above will look like this:
@@ -65,7 +65,8 @@ https://docs.soliditylang.org/en/v0.8.7/internals/layout_in_storage.html.
 The storage section created by the `createContent.js` script defines 
  * the initial `validators` array
  * the initial `allowedAccounts` mapping
+ * the initial `validatorToAccounts` mapping
  * the initial `numAllowedAccounts` uint
 
-For more detail plese see the script.
+For more detail please see the script.
 

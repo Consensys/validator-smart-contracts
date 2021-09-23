@@ -17,8 +17,11 @@ A number of events are emitted to enable users to get information about changes 
 and voting.
 
 To be able to use this contract starting from the genesis block of a blockchain the initial state of this contract 
-needs to be set in the genesis file. The `scripts/allowlist` directory of this 
+needs to be set in the genesis file. The `scripts/allowlist/genesisContent` directory of this 
 repository contains a javascript script that creates the storage section for this contract.
+
+The `scripts/allowlist/cli` directory contains a simple cli script that can be used to call the allowlist smart
+contract functions.
 
 ### Build the Contract
 

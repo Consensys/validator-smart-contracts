@@ -22,4 +22,4 @@ accounts can also vote to add additional accounts to the allowlist, and to remov
 
 To make use of this contract starting from the genesis block, the genesis file needs to contain this contract, as well 
 as the storage content for the initial allowed accounts and validators. See /scripts/allowlist/ for utilities to 
-generate the required storage.
+generate the required storage and a simple cli script to call the allowlist smart contract functions.

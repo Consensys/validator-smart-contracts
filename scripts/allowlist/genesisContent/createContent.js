@@ -1,4 +1,4 @@
-const BN = require("bn.js");
+const BN = require("../node_modules/bn.js/lib/bn");
 const fs = require("fs");
 const XRegExp = require('xregexp');
 const { sha3, soliditySha3, padLeft } = require("web3-utils");
