@@ -20,7 +20,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
 
     event Vote(
         address indexed accountVotedFor,
-        address indexed votingAccout,
+        address indexed votingAccount,
         uint numVotes,
         uint numVotesNeeded,
         bool voteToAdd,

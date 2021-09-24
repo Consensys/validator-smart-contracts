@@ -37,13 +37,12 @@ const argv = require('yargs')
             type: 'string',
         }
     })
-    .command('getValidators', 'get validators for the last block', {
+    .command('getValidators', 'get validators from the latest block', {
     })
     .command('numAllowedAccounts', 'get the number of allowed accounts for the last block', {
     })
     .option('contractAddress', {
         alias: 'a',
-        demandOption: true,
         default: "0000000000000000000000000000000000008888",
         describe: 'address of the validator management contract',
         type: 'string',
@@ -91,23 +90,31 @@ function getHex(str, len, need0x, name) {
     return prefix0x(need0x, str);
 }
 
-function validHexAccount(str) {
-    var re = XRegExp(`^0x[0-9A-Fa-f]{40}$`);
-    if (!re.test(str)) {
-        if (str.length !== 42) {
-            return false;
-        }
+async function printEvent(eventname, receipt) {
+    const result = receipt.events[eventname].returnValues;
+    switch (eventname) {
+        case "Validator":
+            const activated = result.activated ? "activated" : "deactivated";
+            console.log(`Success: Account ${result.byAccount} has ${activated} validator ${result.validator}. Active validators: ${result.numValidators}.`);
+            break;
+        case "Vote":
+            const addRemove = result.voteToAdd ? "add" : "remove";
+            const voteRemoved = result.voteRemoved ? "removed his vote" : "has voted";
+            const numVotesString = (result.numVotes === "1") ? "is 1 vote" : `are ${result.numVotes} votes`;
+                console.log(`Success: Account ${result.votingAccount} ${voteRemoved} to ${addRemove} account ${result.accountVotedFor}.`);
+                console.log(`There ${numVotesString} now and ${result.numVotesNeeded} needed to ${addRemove} this account.`);
+            break;
+        case "AllowedAccount":
+            const added = result.added ? "added to" : "removed from";
+            console.log(`Success: Account ${result.account} has been ${added} the allowlist.`);
+            break;
+        default:
+            console.log(result);
     }
-    return true;
-}
-
-async function getEvent(eventname, mycontract, receipt) {
-    const event = await mycontract.getPastEvents(eventname,
-        {fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber});
-    console.log(`Event from transaction:\n${JSON.stringify(event[0], null, 4)}`)
 }
 
 async function main() {
+    // This file is generated using 'solc --abi ValidatorSmartContractAllowList.sol -o .'
     const abi = Fs.readFileSync('ValidatorSmartContractAllowList.abi', 'utf-8');
     const contractJson = JSON.parse(abi);
 
@@ -127,7 +134,7 @@ async function main() {
     // check whether the contract address is correct
     try {
         validators = await mycontract.methods.getValidators().call();
-        if (validators.length < 1 || !validHexAccount(validators[0])) {
+        if (validators.length < 1 || !web3.utils.isAddress(web3.utils.toChecksumAddress(validators[0]))) {
             console.log("The contract address provided is not correct. Please check and rerun!");
             console.log(`Got the following return value calling the getValidators method on the contract:\n${validators}`)
             process.exit(-1);
@@ -138,12 +145,11 @@ async function main() {
         process.exit(-1);
     }
 
-    let status;
     let receipt;
     try {
         switch (argv._[0]) {
             case "getValidators":
-                console.log(`Validators: ${validators}`); // validators have already been retrieved to check contract
+                console.log(`Validators: ${validators}`); // validators have already been retrieved when we checked the contract
                 break;
             case "numAllowedAccounts":
                 const numAllowedAccounts = await mycontract.methods.numAllowedAccounts().call();
@@ -152,44 +158,32 @@ async function main() {
             case "activate":
                 console.log(`Sending a transaction from account ${myAccount.address} to activate validator ${argv.validator}`);
                 receipt = await mycontract.methods.activate(getHex(argv.validator, 40, true, "validator")).send({from: myAccount.address});
-                status = receipt.status ? "Success" : "Failed";
-                console.log(`Activating validator ${argv.validator} for account ${myAccount.address}: ${status}`);
-                await getEvent("Validator", mycontract, receipt);
+                await printEvent("Validator", receipt);
                 break;
             case "deactivate":
                 console.log(`Sending a transaction from account ${myAccount.address} to deactivate its validator`);
                 receipt = await mycontract.methods.deactivate().send({from: myAccount.address});
-                status = receipt.status ? "Success" : "Failed";
-                console.log(`Deactivating validator for account ${myAccount.address}: ${status}`);
-                await getEvent("Validator", mycontract, receipt);
+                await printEvent("Validator", receipt);
                 break;
             case "addAccount":
                 console.log(`Sending a transaction from account ${myAccount.address} to vote to add account ${argv.account} to the allowlist`);
                 receipt = await mycontract.methods.voteToAddAccountToAllowList(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                status = receipt.status ? "Success" : "Failed";
-                console.log(`Vote to add account ${argv.account}: ${status}`);
-                await getEvent("Vote", mycontract, receipt);
+                await printEvent("Vote", receipt);
                 break;
             case "removeAccount":
                 console.log(`Sending a transaction from account ${myAccount.address} to vote to remove account ${argv.account} from the allowlist`);
                 receipt = await mycontract.methods.voteToRemoveAccountFromAllowList(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                status = receipt.status ? "Success" : "Failed";
-                console.log(`Vote to remove account ${argv.account}: ${status}`);
-                await getEvent("Vote", mycontract, receipt);
+                await printEvent("Vote", receipt);
                 break;
             case "removeVote":
                 console.log(`Sending a transaction from account ${myAccount.address} to remove vote for account ${argv.account}`);
                 receipt = await mycontract.methods.removeVoteForAccount(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                status = receipt.status ? "Success" : "Failed";
-                console.log(`Remove vote for account ${argv.account}: ${status}`);
-                await getEvent("Vote", mycontract, receipt);
+                await printEvent("Vote", receipt);
                 break;
             case "countVotes":
                 console.log(`Sending a transaction from account ${myAccount.address} to count the votes for account ${argv.account}`);
                 receipt = await mycontract.methods.countVotes(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                status = receipt.status ? "Success" : "Failed";
-                console.log(`Count votes for account ${argv.account}: ${status}`);
-                await getEvent("AllowedAccount", mycontract, receipt);
+                await printEvent("AllowedAccount", receipt);
                 break;
             default:
                 console.log(`Unknown command ${argv._[0]}`);
@@ -199,12 +193,12 @@ async function main() {
         const message = e.message;
         const lines = message.split('\n');
         if (lines.length > 1 && lines[0] === "Execution reverted" && lines[1].length > 138 && lines[1].startsWith("0x")) {
-            console.log(`Execution reverted with revert reason:\n${web3.utils.hexToAscii("0x" + lines[1].substr(138))}`);
+            console.error(`Execution reverted with revert reason:\n${web3.utils.hexToAscii("0x" + lines[1].substr(138))}`);
         } else {
-            console.log(message);
+            console.error(message);
         }
+        process.exit(-1);
     }
-
     process.exit(0);
 }
 
