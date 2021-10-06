@@ -22,7 +22,7 @@ These accounts can also vote to add additional accounts to the allowlist, and to
 
 To make use of this contract starting from the genesis block, the genesis file needs to contain this contract, as well 
 as the storage content for the initial allowed accounts and validators. See 
-[chapter "Genesis File Content"](#Genesis-File-Content) for a utility to generate the required storage. 
+[chapter "Genesis File Content"](#genesis-file-content) for a utility to generate the required storage. 
 
 **See the web3-js based script in _scripts/allowlist/cli_ for a simple cli script to call the allowlist smart contract functions.**
 
