@@ -27,10 +27,10 @@ To run the script in the `scripts/allowlist/genesisContent` directory: `node cre
 
 The script creates a file named `Storage.txt`. The content of this file for the example above will look like this:
 
-	"<insert contract address here>": {
+	"<Address of Contract>": {
 		"comment": "validator smart contract",
 		"balance": "0x00",
-		"code": "0x<insert bin-runtime code of the contract here>",
+		"code": "0x<Contract Code>",
 		"storage": {
 			"0000000000000000000000000000000000000000000000000000000000000000": "0000000000000000000000000000000000000000000000000000000000000002",
 			"290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563": "000000000000000000000000ab8483f64d9c6d1ecf9b849ae677dd3315835cb2",

@@ -42,7 +42,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
     mapping(address => address[]) private currentVotes;// mapping the votes for adding or removing an account to the accounts that voted for it
 
     modifier senderIsAllowed() {
-        require(allowedAccounts[msg.sender].allowed, "sender is not on the allow list");
+        require(allowedAccounts[msg.sender].allowed, "sender is not on the allowlist");
         _;
     }
 

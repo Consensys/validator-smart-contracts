@@ -8,10 +8,10 @@ Accounts on the allowlist can use the API of this contract to
 * remove votes they have cast to add or remove an account
 * execute the vote count for an account to be added or removed
 
-For a vote to be successful more than 50% of the current members of the allowlist have to vote. 
+For an election to be successful more than 50% of the current members of the allowlist have to vote. 
 
-To get the votes counted and a new account being added or an account to be removed the function _countVotes needs to 
-be called.
+To get the votes counted and (if successful) the outcome enacted (the specified account added or removed), 
+the function _countVotes_ needs to be called.
 
 A number of events are emitted to enable users to get information about changes to the validators, allowed accounts, 
 and voting.
@@ -23,7 +23,7 @@ repository contains a javascript script that creates the storage section for thi
 The `scripts/allowlist/cli` directory contains a simple cli script that can be used to call the allowlist smart
 contract functions.
 
-### Build the Contract
+### Compile the Contract
 
 To create the contract code that needs to be specified in the genesis file, this contract needs to be compiled with the
 option `--bin-runtime`.

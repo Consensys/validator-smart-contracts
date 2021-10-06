@@ -43,7 +43,7 @@ const argv = require('yargs')
     })
     .option('contractAddress', {
         alias: 'a',
-        default: "0000000000000000000000000000000000008888",
+        default: "0000000000000000000000000000000000009999",
         describe: 'address of the validator management contract',
         type: 'string',
     })
@@ -99,7 +99,7 @@ async function printEvent(eventname, receipt) {
             break;
         case "Vote":
             const addRemove = result.voteToAdd ? "add" : "remove";
-            const voteRemoved = result.voteRemoved ? "removed his vote" : "has voted";
+            const voteRemoved = result.voteRemoved ? "removed their vote" : "has voted";
             const numVotesString = (result.numVotes === "1") ? "is 1 vote" : `are ${result.numVotes} votes`;
                 console.log(`Success: Account ${result.votingAccount} ${voteRemoved} to ${addRemove} account ${result.accountVotedFor}.`);
                 console.log(`There ${numVotesString} now and ${result.numVotesNeeded} needed to ${addRemove} this account.`);

@@ -11,10 +11,10 @@ function main() {
 
     let section = {};
     let contract = {};
-    section["<insert contract address here>"] = contract;
+    section["<Address of Contract>"] = contract;
     contract.comment = "validator smart contract";
     contract.balance = "0x00";
-    contract.code = "0x<insert bin-runtime code of the contract here>";
+    contract.code = "0x<Contract Code>";
     let storage = {};
 
     let validatorIndex = 0;
@@ -86,7 +86,7 @@ function main() {
 
     var writeStream = fs.createWriteStream("Storage.txt");
     let stringify = JSON.stringify(section, null, "\t");
-    writeStream.write(stringify.substring(2, stringify.length - 2)); // do not wirte lines with enclosing brackets
+    writeStream.write(stringify.substring(2, stringify.length - 2)); // do not write lines with enclosing brackets
 }
 
 function testIfHexAddress(hexString, lineNumber) {

@@ -16,9 +16,9 @@ General information about QBFT can be found here: https://besu.hyperledger.org/e
 
 This smart contract can be found in the directory contracts/allowlist. 
 
-The contract holds a list of accounts that are allowed to nominate a QBFT validator each, the allowlist. Each of these 
-accounts can use transactions to call certain functions on the contract to activate and deactivate a validator. These 
-accounts can also vote to add additional accounts to the allowlist, and to remove them.
+The contract holds a list of accounts (the allowlist) that are each allowed to nominate one QBFT validator. Each of 
+these accounts can use transactions to call certain functions on the contract to activate and deactivate a validator. 
+These accounts can also vote to add additional accounts to the allowlist, and to remove them.
 
 To make use of this contract starting from the genesis block, the genesis file needs to contain this contract, as well 
 as the storage content for the initial allowed accounts and validators. See /scripts/allowlist/ for utilities to 
