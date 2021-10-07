@@ -1,6 +1,6 @@
 # Manual Testing
 
-This directory and it's subdirectories contain configuration files and other files that can be used to create a 
+This directory and its subdirectories contain configuration files and other files that can be used to create a 
 two node Besu cluster that uses QBFT to validate blocks and the allowlist smart contract to select the validators. 
 
 This has been tested to work with besu version besu/v21.10.0-RC2-dev-012d95ce/osx-x86_64/oracle_openjdk-java-11.
@@ -20,9 +20,9 @@ Validators:
 
 Allowed Accounts:
  * 0xfe3b557e8fb62b89f4916b721be55ceb828dbd73, private key: 0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63 
-   (acitve validator in genesis block is 0x9A6d82Ef3912d5aB60473124BCCd2f2A640769D7)
+   (active validator in genesis block is 0x9A6d82Ef3912d5aB60473124BCCd2f2A640769D7)
  * 0x627306090abaB3A6e1400e9345bC60c78a8BEf57, private key: 0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3
-   (acitve validator in genesis block is 0x65463BF6268e5cC409b6501eC846487B935A1446)
+   (active validator in genesis block is 0x65463BF6268e5cC409b6501eC846487B935A1446)
 
 
 ##Example CLI calls:
