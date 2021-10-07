@@ -40,6 +40,8 @@ node allowlist.js countVotes 0x627306090abaB3A6e1400e9345bC60c78a8BEf57 -p 0x8f2
 
 node allowlist.js activate 0x65463BF6268e5cC409b6501eC846487B935A1446 -p 0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3 -i 2017 -u http://localhost:8590
 
+node allowlist.js activate 0x65463BF6268e5cC409b6501eC846487B935A1446 -p 0x8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63 -i 2017 -u http://localhost:8590
+
 node allowlist.js activate 0x65463BF6268e5cC409b6501eC846487B935A1446 -p 0x70f1384b24df3d2cdaca7974552ec28f055812ca5e4da7a0ccd0ac0f8a4a9b00 -i 2017 -u http://localhost:8590
 
 node allowlist.js activate 0x9A6d82Ef3912d5aB60473124BCCd2f2A640769D7 -p 0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3 -i 2017 -u http://localhost:8590

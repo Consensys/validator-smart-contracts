@@ -16,15 +16,7 @@ General information about QBFT can be found here: https://besu.hyperledger.org/e
 
 This smart contract can be found in the directory _contracts/allowlist_. 
 
-The contract holds a list of accounts (the allowlist) that are each allowed to nominate one QBFT validator. Each of 
-these accounts can use transactions to call certain functions on the contract to activate and deactivate a validator. 
-These accounts can also vote to add additional accounts to the allowlist, and to remove them.
-
-To make use of this contract starting from the genesis block, the genesis file needs to contain this contract, as well 
-as the storage content for the initial allowed accounts and validators. See 
-[chapter "Genesis File Content"](#genesis-file-content) for a utility to generate the required storage. 
-
-**See the web3-js based script in _scripts/allowlist/cli_ for a simple cli script to call the allowlist smart contract functions.**
+The contract holds a list of accounts (the allowlist) that are each allowed to nominate one QBFT validator. 
 
 Accounts on the allowlist can use the API of this contract to
 * activate a validator
@@ -39,12 +31,15 @@ For an election to be successful more than 50% of the current members of the all
 To get the votes counted and (if successful) the outcome enacted (the specified account added or removed),
 the function _countVotes_ needs to be called.
 
-A number of events are emitted to enable users to get information about changes to the validators, allowed accounts,
+Events are emitted to enable users to get information about changes to the validators, allowed accounts,
 and voting.
 
 To be able to use this contract starting from the genesis block of a blockchain the initial state of this contract
 needs to be set in the genesis file. The `scripts/allowlist/genesisContent` directory of this
-repository contains a javascript script that creates the storage section for this contract.
+repository contains a javascript script that creates the storage section for this contract
+(See [chapter "Genesis File Content"](#genesis-file-content)).
+
+_See the web3-js based script in **_scripts/allowlist/cli_** for a simple cli script to call the allowlist smart contract functions._
 
 ### Compile the Contract
 
@@ -127,7 +122,7 @@ https://docs.soliditylang.org/en/v0.8.7/internals/layout_in_storage.html.
 
 The storage section created by the `createContent.js` script defines
 * the initial `validators` array (line 1 - 3 in the storage section)
-* the initial `allowedAccounts` mapping (line 4 - 6 in the sotrage section)
+* the initial `allowedAccounts` mapping (line 4 - 6 in the storage section)
 * the initial `validatorToAccounts` mapping (line 7 and 8 in the storage section)
 * the initial `numAllowedAccounts` uint (line 9 in the storage section)
 

@@ -43,7 +43,7 @@ const argv = require('yargs')
     })
     .option('contractAddress', {
         alias: 'a',
-        default: "0000000000000000000000000000000000009999",
+        default: "0000000000000000000000000000000000007777",
         describe: 'address of the validator management contract',
         type: 'string',
     })
