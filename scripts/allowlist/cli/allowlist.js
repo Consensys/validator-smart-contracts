@@ -90,8 +90,15 @@ function getHex(str, len, need0x, name) {
     return prefix0x(need0x, str);
 }
 
-async function printEvent(eventname, receipt) {
-    const result = receipt.events[eventname].returnValues;
+function printEvent(eventname, receipt) {
+    try {
+        const result = receipt.events[eventname].returnValues;
+    } catch(e) {
+        if (e.message === "Cannot read property 'returnValues' of undefined") {
+            console.log("No event was received.")
+            return;
+        }
+    }
     switch (eventname) {
         case "Validator":
             const activated = result.activated ? "activated" : "deactivated";
@@ -158,32 +165,32 @@ async function main() {
             case "activate":
                 console.log(`Sending a transaction from account ${myAccount.address} to activate validator ${argv.validator}`);
                 receipt = await mycontract.methods.activate(getHex(argv.validator, 40, true, "validator")).send({from: myAccount.address});
-                await printEvent("Validator", receipt);
+                printEvent("Validator", receipt);
                 break;
             case "deactivate":
                 console.log(`Sending a transaction from account ${myAccount.address} to deactivate its validator`);
                 receipt = await mycontract.methods.deactivate().send({from: myAccount.address});
-                await printEvent("Validator", receipt);
+                printEvent("Validator", receipt);
                 break;
             case "addAccount":
                 console.log(`Sending a transaction from account ${myAccount.address} to vote to add account ${argv.account} to the allowlist`);
                 receipt = await mycontract.methods.voteToAddAccountToAllowList(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                await printEvent("Vote", receipt);
+                printEvent("Vote", receipt);
                 break;
             case "removeAccount":
                 console.log(`Sending a transaction from account ${myAccount.address} to vote to remove account ${argv.account} from the allowlist`);
                 receipt = await mycontract.methods.voteToRemoveAccountFromAllowList(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                await printEvent("Vote", receipt);
+                printEvent("Vote", receipt);
                 break;
             case "removeVote":
                 console.log(`Sending a transaction from account ${myAccount.address} to remove vote for account ${argv.account}`);
                 receipt = await mycontract.methods.removeVoteForAccount(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                await printEvent("Vote", receipt);
+                printEvent("Vote", receipt);
                 break;
             case "countVotes":
                 console.log(`Sending a transaction from account ${myAccount.address} to count the votes for account ${argv.account}`);
                 receipt = await mycontract.methods.countVotes(getHex(argv.account, 40, true, "account")).send({from: myAccount.address});
-                await printEvent("AllowedAccount", receipt);
+                printEvent("AllowedAccount", receipt);
                 break;
             default:
                 console.log(`Unknown command ${argv._[0]}`);
