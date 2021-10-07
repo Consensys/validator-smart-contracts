@@ -20,7 +20,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
 
     event Vote(
         address indexed accountVotedFor,
-        address indexed votingAccout,
+        address indexed votingAccount,
         uint numVotes,
         uint numVotesNeeded,
         bool voteToAdd,
@@ -37,11 +37,12 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
 
     address[] private validators;
     mapping(address => accountInfo) private allowedAccounts;
+    mapping(address => address) private validatorToAccount;
     uint public numAllowedAccounts;
-    mapping(address => address[]) private currentVotes; // mapping the votes for adding or removing an account to the accounts that voted for it
+    mapping(address => address[]) private currentVotes;// mapping the votes for adding or removing an account to the accounts that voted for it
 
     modifier senderIsAllowed() {
-        require(allowedAccounts[msg.sender].allowed, "sender is not on the allow list");
+        require(allowedAccounts[msg.sender].allowed, "sender is not on the allowlist");
         _;
     }
 
@@ -57,6 +58,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 require(initialValidators[i] != address(0), "initial validators cannot be zero");
                 allowedAccounts[initialAccounts[i]] = accountInfo(true, true, uint8(i));
                 validators.push(initialValidators[i]);
+                validatorToAccount[initialValidators[i]] = initialAccounts[i];
             } else {
                 allowedAccounts[initialAccounts[i]] = accountInfo(true, false, 0);
             }
@@ -82,6 +84,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
             allowedAccounts[msg.sender].validatorIndex = uint8(validators.length);
             validators.push(newValidator);
         }
+        validatorToAccount[newValidator] = msg.sender;
         emit Validator(newValidator, msg.sender, validators.length, true);
     }
 
@@ -89,9 +92,13 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
         require(validators.length > 1, "cannot deactivate last validator");
         require(allowedAccounts[msg.sender].activeValidator, "sender does not have an active validator");
         allowedAccounts[msg.sender].activeValidator = false;
-        address validatorRemoved = validators[allowedAccounts[msg.sender].validatorIndex];
-        validators[allowedAccounts[msg.sender].validatorIndex] = validators[validators.length-1];
+        uint8 deactivatedValidatorIndex = allowedAccounts[msg.sender].validatorIndex;
+        address validatorRemoved = validators[deactivatedValidatorIndex];
+        address validatorToBeMoved = validators[validators.length-1];
+        validators[deactivatedValidatorIndex] = validatorToBeMoved;
+        allowedAccounts[validatorToAccount[validatorToBeMoved]].validatorIndex = deactivatedValidatorIndex;
         validators.pop();
+        delete(validatorToAccount[validatorRemoved]);
         emit Validator(validatorRemoved, msg.sender, validators.length, false);
     }
 
@@ -124,7 +131,7 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 break;
             }
         }
-        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, !(allowedAccounts[account].allowed), false);
+        emit Vote(account, msg.sender, currentVotes[account].length, numAllowedAccounts/2 + 1, !(allowedAccounts[account].allowed), true);
     }
 
     function countVotes(address account) external senderIsAllowed returns(uint numVotes, uint requiredVotes, bool electionSucceeded) {
@@ -140,8 +147,12 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
                 numAllowedAccounts--;
                 if(allowedAccounts[account].activeValidator) {
                     require(validators.length > 1, "cannot remove allowed account with last active validator");
-                    validators[allowedAccounts[account].validatorIndex] = validators[validators.length - 1];
+                    uint8 indexToBeOverwritten = allowedAccounts[account].validatorIndex;
+                    delete(validatorToAccount[validators[indexToBeOverwritten]]);
+                    address validatorToBeMoved = validators[validators.length - 1];
+                    validators[indexToBeOverwritten] = validatorToBeMoved;
                     validators.pop();
+                    allowedAccounts[validatorToAccount[validatorToBeMoved]].validatorIndex = indexToBeOverwritten;
                 }
                 delete(allowedAccounts[account]);
             } else {
@@ -153,4 +164,3 @@ contract ValidatorSmartContractAllowList is ValidatorSmartContractInterface {
         return (numVotes, numAllowedAccounts / 2 + 1, numVotes > numAllowedAccounts / 2);
     }
 }
-

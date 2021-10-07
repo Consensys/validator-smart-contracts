@@ -178,6 +178,28 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         assert.equal(result.electionSucceeded, true);
     });
 
+    it("can remove allowed account with validator, add account back in without validator", async () => {
+        await addValidators(1, 1);
+
+        await allowListContract.voteToRemoveAccountFromAllowList(accounts[1], {from: accounts[0]});
+        await allowListContract.voteToRemoveAccountFromAllowList(accounts[1], {from: accounts[1]});
+        await allowListContract.countVotes(accounts[1], {from: accounts[0]});
+        const web3Contract = new web3.eth.Contract(allowListContractAbi, allowListContract.address);
+        let vals = await web3Contract.methods.getValidators().call({from: accounts[0]});
+
+        assert.equal(vals.length, 1);
+        assert.equal(vals[0], validators[0]);
+
+        await allowListContract.voteToAddAccountToAllowList(accounts[1], {from: accounts[0]});
+        await allowListContract.countVotes(accounts[1], {from: accounts[0]});
+        vals = await web3Contract.methods.getValidators().call({from: accounts[0]});
+        let numAllowedAccounts = await web3Contract.methods.numAllowedAccounts().call({from: accounts[0]});
+
+        assert.equal(numAllowedAccounts, 2);
+        assert.equal(vals.length, 1);
+        assert.equal(vals[0], validators[0]);
+    });
+
     it("account not on the allow list cannot call voteToAddAccountToAllowList", async () => {
         try {
             await allowListContract.voteToAddAccountToAllowList(accounts[0], {from: accounts[3]});
@@ -282,6 +304,24 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
         } catch (err) {
             expect(err.reason).to.contain("initial validators cannot be zero");
         }
+    });
+
+    it("allowedAccounts mappings validator index is updated correctly", async () => {
+        await addValidators(1, 1);
+
+        let numAllowedAccounts = await allowListContract.numAllowedAccounts();
+        assert.equal(numAllowedAccounts, 2);
+
+        await allowListContract.deactivate({from: accounts[0]});
+
+        const web3Contract = new web3.eth.Contract(allowListContractAbi, allowListContract.address);
+        let vals = await web3Contract.methods.getValidators().call({from: accounts[0]});
+        assert.equal(vals.length, 1);
+
+        await allowListContract.activate(validators[0], {from: accounts[1]});
+        vals = await web3Contract.methods.getValidators().call({from: accounts[0]});
+        assert.equal(vals.length, 1);
+        assert.equal(vals[0], validators[0]);
     });
 
     // assumes that accounts 0 to start-1 are allowed
