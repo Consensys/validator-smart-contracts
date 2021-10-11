@@ -76,6 +76,10 @@ to be separated by a comma:
 
 The three lines above specify three accounts on the allow list, as well as the validators for the first and third account.
 
+> You can export the node public-key using the besu command  
+> `besu public-key export-address`
+ 
+
 ### Run the Script
 
 To run the script in the `scripts/allowlist/genesisContent` directory: `node createContent.js`
