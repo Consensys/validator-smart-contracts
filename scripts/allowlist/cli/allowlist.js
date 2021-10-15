@@ -91,8 +91,9 @@ function getHex(str, len, need0x, name) {
 }
 
 function printEvent(eventname, receipt) {
+    let result;
     try {
-        const result = receipt.events[eventname].returnValues;
+        result = receipt.events[eventname].returnValues;
     } catch(e) {
         if (e.message === "Cannot read property 'returnValues' of undefined") {
             console.log("No event was received.")

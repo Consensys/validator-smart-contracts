@@ -26,6 +26,7 @@ Allowed Accounts:
 
 
 ##Example CLI calls:
+
 export NODE_NO_WARNINGS=1
 
 node allowlist.js getValidators -p 0x70f1384b24df3d2cdaca7974552ec28f055812ca5e4da7a0ccd0ac0f8a4a9b00 -i 2017 -u http://localhost:8590

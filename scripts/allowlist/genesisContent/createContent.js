@@ -82,7 +82,6 @@ function main() {
 
 
     contract.storage = storage;
-    contract.version = "0x01";
 
     var writeStream = fs.createWriteStream("Storage.txt");
     let stringify = JSON.stringify(section, null, "\t");
