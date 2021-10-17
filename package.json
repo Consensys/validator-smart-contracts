@@ -19,10 +19,13 @@
   "homepage": "https://github.com/ConsenSys/validator-smart-contracts#readme",
   "dependencies": {
     "save-dev": "^0.0.1-security",
-    "web3": "^1.5.0",
+    "web3": "1.5.3",
     "ws": ">5.0.0"
   },
   "devDependencies": {
     "truffle": "5.1.58"
+  },
+  "resolutions": {
+    "**/ansi-regex": "6.0.1"
   }
 }
