@@ -69,7 +69,7 @@ needs to be added to the genesis file of a network that makes use of the allowli
 
 ### Install the dependencies
 
-To install the dependencies of the script run `npm install` in the `scripts/allowlist/genesisContent` directory.
+To install the dependencies of the script run `yarn install` in the `scripts/allowlist/genesisContent` directory.
 
 ### Input File
 
