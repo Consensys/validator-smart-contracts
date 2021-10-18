@@ -41,7 +41,7 @@ repository contains a javascript script that creates the storage section for thi
 
 _See the web3-js based script in **_scripts/allowlist/cli_** for a simple cli script to call the allowlist smart contract functions._
 
-### Compile the Contract
+### Compiling the contract for deployment
 
 To create the contract code that needs to be specified in the genesis file, this contract needs to be compiled with the
 option `--bin-runtime`.
@@ -54,6 +54,14 @@ the contract can be compiled using solc 0.8.7
 
     solc --optimize --bin-runtime --evm-version=byzantium -o . ./ValidatorSmartContractAllowList.sol
 
+### Running tests
+
+Unit tests are executed via Truffle:
+
+    yarn install
+    yarn truffle compile
+    yarn truffle test
+
 ## Genesis File Content
 
 The _script/allowlist/genesisContent_ directory contains a script (`createContent.js`) that generates some content that 
@@ -61,7 +69,7 @@ needs to be added to the genesis file of a network that makes use of the allowli
 
 ### Install the dependencies
 
-To install the dependencies of the script run `npm install` in the `scripts/allowlist/genesisContent` directory.
+To install the dependencies of the script run `yarn install` in the `scripts/allowlist/genesisContent` directory.
 
 ### Input File
 
@@ -84,7 +92,7 @@ The three lines above specify three accounts on the allow list, as well as the v
 
 To run the script in the `scripts/allowlist/genesisContent` directory: `node createContent.js`
 
-###Output
+### Output
 
 The script creates a file named `Storage.txt`. The content of this file for the example above will look like this:
 
