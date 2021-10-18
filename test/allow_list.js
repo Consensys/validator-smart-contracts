@@ -205,7 +205,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.voteToAddAccountToAllowList(accounts[0], {from: accounts[3]});
             assert.fail("Should not allow account not on the allow list to call add");
         } catch (err) {
-            expect(err.reason).to.contain("sender is not on the allow list");
+            expect(err.reason).to.contain("sender is not on the allowlist");
         }
     });
 
@@ -214,7 +214,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.voteToRemoveAccountFromAllowList(accounts[0], {from: accounts[3]});
             assert.fail("Should not allow account not on the allow list to call remove");
         } catch (err) {
-            expect(err.reason).to.contain("sender is not on the allow list");
+            expect(err.reason).to.contain("sender is not on the allowlist");
         }
     });
 
@@ -223,7 +223,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.countVotes(accounts[0], {from: accounts[3]});
             assert.fail("Should not allow account not on the allow list to call countVotes");
         } catch (err) {
-            expect(err.reason).to.contain("sender is not on the allow list");
+            expect(err.reason).to.contain("sender is not on the allowlist");
         }
     });
 
@@ -232,7 +232,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.activate(accounts[0], {from: accounts[3]});
             assert.fail("Should not allow account not on the allow list to call activate");
         } catch (err) {
-            expect(err.reason).to.contain("sender is not on the allow list");
+            expect(err.reason).to.contain("sender is not on the allowlist");
         }
     });
 
@@ -241,7 +241,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.deactivate({from: accounts[3]});
             assert.fail("Should not allow account not on the allow list to call countVotes");
         } catch (err) {
-            expect(err.reason).to.contain("sender is not on the allow list");
+            expect(err.reason).to.contain("sender is not on the allowlist");
         }
     });
 
@@ -250,7 +250,7 @@ contract ("Account Ingress (no contracts registered)", (accounts) => {
             await allowListContract.removeVoteForAccount(accounts[0], {from: accounts[3]});
             assert.fail("Should not allow account not on the allow list to call removeVoteForAccount");
         } catch (err) {
-            expect(err.reason).to.contain("sender is not on the allow list");
+            expect(err.reason).to.contain("sender is not on the allowlist");
         }
     });
 
