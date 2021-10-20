@@ -14,5 +14,8 @@
     "xregexp": "^5.1.0",
     "yargs": "^17.1.1"
   },
+  "resolutions": {
+    "**/fetch-ponyfill": "7.1.0"
+  },
   "description": ""
 }
