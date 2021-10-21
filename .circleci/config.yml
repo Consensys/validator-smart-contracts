@@ -46,7 +46,11 @@ jobs:
       - run:
           name: Truffle compile
           command: |
-            yarn truffle compile          
+            yarn truffle compile
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./      
             
   test:
     executor: med
