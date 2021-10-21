@@ -36,17 +36,28 @@ jobs:
           root: ~/project
           paths:
             - ./
-            
-  test:
+
+  compile:
     executor: med
     steps:
       - prepare
       - attach_workspace:
           at: ~/project
       - run:
+          name: Truffle compile
+          command: |
+            yarn truffle compile          
+            
+  test:
+    executor: med
+    steps:
+      - compile
+      - attach_workspace:
+          at: ~/project
+      - run:
           name: Truffle tests
           command: |
-            yarn run test
+            yarn truffle test
 
 workflows:
   version: 2
@@ -57,9 +68,16 @@ workflows:
             tags:
               only:
                 - /.*/
-      - test:
+      - compile:
           requires:
             - dependencies
+          filters:
+            tags:
+              only:
+                - /.*/             
+      - test:
+          requires:
+            - compile
           filters:
             tags:
               only:
