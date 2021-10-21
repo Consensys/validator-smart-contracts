@@ -74,11 +74,11 @@ workflows:
           filters:
             tags:
               only:
-                - /.*/             
+                - /.*/
       - test:
           requires:
             - compile
           filters:
             tags:
               only:
-                - /.*/          
+                - /.*/
