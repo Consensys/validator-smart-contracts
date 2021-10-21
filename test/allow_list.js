@@ -1,7 +1,7 @@
 const AllowListContract = artifacts.require("ValidatorSmartContractAllowList.sol");
 
 var fs = require('fs');
-var jsonFile = "build/contracts/ValidatorSmartContractAllowList.json";
+var jsonFile = "./build/contracts/ValidatorSmartContractAllowList.json";
 var parsed= JSON.parse(fs.readFileSync(jsonFile));
 var allowListContractAbi = parsed.abi;
 
