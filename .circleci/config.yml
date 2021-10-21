@@ -51,7 +51,7 @@ jobs:
   test:
     executor: med
     steps:
-      - compile
+      - prepare
       - attach_workspace:
           at: ~/project
       - run:
