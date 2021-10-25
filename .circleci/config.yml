@@ -1,0 +1,88 @@
+version: 2.1
+executors:
+  med: # 2cpu, 4G ram
+    docker:
+      - image: circleci/node:10
+    resource_class: medium
+    working_directory: ~/project
+
+commands:
+  prepare:
+    description: "Prepare"
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore cached dependencies
+          keys:
+            - deps-{{ checksum "package.json" }}-{{ .Branch }}-{{ .Revision }}
+            - deps-{{ checksum "package.json" }}
+            - deps-
+
+jobs:
+  dependencies:
+    executor: med
+    steps:
+      - prepare
+      - run:
+          name: Install Dependencies
+          command: |
+            yarn install
+      - save_cache:
+          name: Caching dependencies
+          key: deps-{{ checksum "package.json" }}-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./
+
+  compile:
+    executor: med
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Truffle compile
+          command: |
+            yarn truffle compile
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./      
+            
+  test:
+    executor: med
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Truffle tests
+          command: |
+            yarn truffle test
+
+workflows:
+  version: 2
+  default:
+    jobs:
+      - dependencies:
+          filters:
+            tags:
+              only:
+                - /.*/
+      - compile:
+          requires:
+            - dependencies
+          filters:
+            tags:
+              only:
+                - /.*/
+      - test:
+          requires:
+            - compile
+          filters:
+            tags:
+              only:
+                - /.*/
