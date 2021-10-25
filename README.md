@@ -1,56 +1,57 @@
-# Validator Smart Contracts
+# Validator smart contracts
 
-The QBFT consensus protocol implementation in the Quorum clients (GoQuorum and Besu) allows users to use a smart
-contract to specify the validators that are used to propose and vaidate blocks.
+The QBFT consensus protocol implementation in the Quorum clients (GoQuorum and Besu) allows you to use a smart
+contract to specify the validators that are used to propose and validate blocks. You can create your own
+smart contract based on your organisation's requirements.
 
-These smart contracts need to implement the interface contract ValidatorSmartContractInterface.sol, specifically the 
-function  
+These smart contracts must implement the `ValidatorSmartContractInterface.sol` interface contract, specifically the
+function:
 
     function getValidators() external view returns (address[] memory)
 
-This repository contains a simple implementation of this interface.
+This repository contains an example smart contract that implements the interface.
 
-General information about QBFT can be found here: https://besu.hyperledger.org/en/stable/HowTo/Configure/Consensus-Protocols/QBFT/
+General information about QBFT can be found in the [Hyperledger Besu documentation](https://besu.hyperledger.org/en/stable/HowTo/Configure/Consensus-Protocols/QBFT/).
 
-## Allowlist Based Contract
+## Example contract
 
-This smart contract can be found in the directory _contracts/allowlist_. 
+The example smart contract can be found in the `contracts/allowlist` directory.
 
-The contract holds a list of accounts (the allowlist) that are each allowed to nominate one QBFT validator. 
+The contract holds a list of accounts (the allowlist) that are each allowed to nominate one QBFT validator
+using an API.
 
-Accounts on the allowlist can use the API of this contract to
-* activate a validator
-* deactivate a validator
-* vote to add an account to the allowlist
-* vote to remove an account from the allowlist
-* remove votes they have cast to add or remove an account
-* execute the vote count for an account to be added or removed
+Accounts on the allowlist can use the API of this contract to:
 
-For an election to be successful more than 50% of the current members of the allowlist have to vote.
+* Activate a validator
+* Deactivate a validator
+* Vote to add an account to the allowlist
+* Vote to remove an account from the allowlist
+* Remove votes they have cast to add or remove an account
+* Execute the vote count for an account to be added or removed
 
-To get the votes counted and (if successful) the outcome enacted (the specified account added or removed),
-the function _countVotes_ needs to be called.
+For an election to be successful more than 50% of the current members of the allowlist must vote. Use the
+`countVotes` function to count the votes, and if successful, add or remove the specified account.
 
 Events are emitted to enable users to get information about changes to the validators, allowed accounts,
 and voting.
 
-To be able to use this contract starting from the genesis block of a blockchain the initial state of this contract
-needs to be set in the genesis file. The `scripts/allowlist/genesisContent` directory of this
-repository contains a javascript script that creates the storage section for this contract
-(See [chapter "Genesis File Content"](#genesis-file-content)).
+To use this contract from the genesis block of a blockchain, the initial state of this contract
+must be set in the genesis file. The `scripts/allowlist/genesisContent` directory of this
+repository contains a javascript script that creates the storage section for this contract.
+Refer to the ["Genesis file content"](#genesis-file-content) section.
 
-_See the web3-js based script in **_scripts/allowlist/cli_** for a simple cli script to call the allowlist smart contract functions._
+**Information**: See the web3-js based script in the `scripts/allowlist/cli` directory for an example CLI script
+that calls the allowlist smart contract functions.
 
 ### Compiling the contract for deployment
 
-To create the contract code that needs to be specified in the genesis file, this contract needs to be compiled with the
-option `--bin-runtime`.
+To create the contract code to add to the genesis file, compile the contract with the `--bin-runtime` option:
 
-After copying the interface contract into this directory
+Copy the interface contract into this directory
 
     cp ../ValidatorSmartContractInterface.sol .
 
-the contract can be compiled using solc 0.8.7
+Then compile the contract using solc 0.8.7
 
     solc --optimize --bin-runtime --evm-version=byzantium -o . ./ValidatorSmartContractAllowList.sol
 
@@ -62,16 +63,12 @@ Unit tests are executed via Truffle:
     yarn truffle compile
     yarn truffle test
 
-## Genesis File Content
+## Create the genesis file content
 
-The _script/allowlist/genesisContent_ directory contains a script (`createContent.js`) that generates some content that 
-needs to be added to the genesis file of a network that makes use of the allowlist smart contracts (`contracts/allowlist`).
+The `script/allowlist/genesisContent` directory contains the `createContent.js` script that generates the content
+required for the genesis file of a network that uses the allowlist smart contracts (`contracts/allowlist`).
 
-### Install the dependencies
-
-To install the dependencies of the script run `yarn install` in the `scripts/allowlist/genesisContent` directory.
-
-### Input File
+### Create the input file
 
 The script reads the file `allowedAccountsAndValidators.txt` that defines in each line the address of an allowed account and
 (optionally) the validator for that account. The account and the validator are specified using their address as a
@@ -82,19 +79,25 @@ to be separated by a comma:
     0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c
     0x4b20993Bc481177ec7E8f571ceCaE8A9e22C02db, 0x79731D3Ca6b7E34aC0F824c42a7cC18A495cabaB
 
-The three lines above specify three accounts on the allow list, as well as the validators for the first and third account.
+The three lines above specify three accounts on the allowlist, and the validators for the first and third account.
 
-> You can export the node public-key using the besu command  
-> `besu public-key export-address`
- 
+You can export the node's address using the following Besu command:
+
+    besu public-key export-address
 
 ### Run the Script
 
-To run the script in the `scripts/allowlist/genesisContent` directory: `node createContent.js`
+**Prerequisites**:
+
+* Install the script dependencies by running run `yarn install` in the `scripts/allowlist/genesisContent` directory.
+
+Run the script in the `scripts/allowlist/genesisContent` directory:
+
+    node createContent.js
 
 ### Output
 
-The script creates a file named `Storage.txt`. The content of this file for the example above will look like this:
+The script creates a file named `Storage.txt`. The content of this file for the above example looks as follows:
 
 	"<Address of Contract>": {
         "comment": "validator smart contract",
@@ -114,19 +117,19 @@ The script creates a file named `Storage.txt`. The content of this file for the 
         "version": "0x01"
     }
 
-The content of the file needs to be placed in the genesis file for the network. In addition the <_Address of Contract_>
-and <_Contract Code_> need to be filled in.
+The content of the file needs to be placed in the genesis file for the network. In addition the `<Address of Contract>`
+and `<Contract Code>` must be filled in.
 
 An example of a genesis file using QBFT can be found in the `genesis.json` file in this directory.
 
-* The <_Address of Contract_> needs to be the same that is stated in the _qbft_ section of the genesis file for the _validatorcontractaddress_.
-* The <_Contract Code_> needs to contain the binary runtime code for the `ValidatorSmartContractAllowList.sol` contract in `contracts/allowlist`.  
-  The binary can be found in the example genesis.json file in this directory. For this binary the
-  `ValidatorSmartContractAllowList.sol` contract was compiled using _--bin-runtime_, _--evm-version byzantium_ and _--optimize_ options of the solidity compiler
+* `<Address of Contract>` must be identical to `validatorcontractaddress` located in the `qbft` section of the genesis file.
+* `<Contract Code>` must contain the binary runtime code for the `ValidatorSmartContractAllowList.sol` contract in `contracts/allowlist`.
+  The binary can be found in the example `genesis.json` file in this directory. For this binary the
+  `ValidatorSmartContractAllowList.sol` contract was compiled using `--bin-runtime`, `--evm-version byzantium`, and `--optimize` options of the solidity compiler.
 
-General information about the genesis file can be found here: https://besu.hyperledger.org/en/stable/Reference/Config-Items/
+General information about the genesis file can be found in the [Besu documentation](https://besu.hyperledger.org/en/stable/Reference/Config-Items/).
 
-#### Short Description of the Content of the "storage" Section in the above Example Output
+#### Short Description of the Content of the "storage" Section in the above example output
 
 The storage section defines the state of the contract in the genesis block of the blockchain.
 For general information on the layout of state variables in storage see
