@@ -81,7 +81,7 @@ to be separated by a comma:
 
 The three lines above specify three accounts on the allowlist, and the validators for the first and third account.
 
-You can export the node's public key using the following Besu command:
+You can export the node's address using the following Besu command:
 
     besu public-key export-address
 
