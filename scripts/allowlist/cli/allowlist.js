@@ -48,6 +48,7 @@ const argv = require('yargs')
         type: 'string',
     })
     .option('privateKey', {
+        demandOption: true,
         alias: 'p',
         describe: 'private key in hexadecimal format',
         type: 'string',
@@ -62,6 +63,7 @@ const argv = require('yargs')
     .option('chainId', {
         alias: 'i',
         demandOption: true,
+        default: '1337',
         describe: 'chainId of the blockchain',
         type: 'string',
     })
@@ -161,7 +163,7 @@ async function main() {
                 break;
             case "numAllowedAccounts":
                 const numAllowedAccounts = await mycontract.methods.numAllowedAccounts().call();
-                console.log(`Number of allowed Acocunts: ${numAllowedAccounts}`);
+                console.log(`Number of allowed Accounts: ${numAllowedAccounts}`);
                 break;
             case "activate":
                 console.log(`Sending a transaction from account ${myAccount.address} to activate validator ${argv.validator}`);
